@@ -1,5 +1,5 @@
 #Easy module_setup
-A very opinionated, single module packaging tool.
+A very opinionated single module packaging tool.
 
 ## Build, distribute and deploy modules easily.
 
