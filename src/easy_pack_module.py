@@ -92,6 +92,8 @@ class EasyPackModule:
     @staticmethod
     def scaffold(folder):
         import os
+        if not os.path.exists(folder):
+            os.mkdir(folder)
         src = folder + "/src"
         resources = folder + "/resources"
         license = resources + "/license.txt"
@@ -126,8 +128,12 @@ class EasyPackModule:
                               "if not path.exists('setup/setup.py') or path.getctime('__info__.py') > path.getctime('setup/setup.py'):\n",
                               "\tprint('package info file has changed, rebuilding setup')\n",
                               "\tmodule.create_setup_files('../setup')\n",
-                              "module.build_module('python-build')\n",
-                              "module.save('.')\n"])
+                              "if module.build_module('python-build'):\n",
+                              "\tprint('build succeded')\n",
+                              "\tprint('use twine upload --repository-url [pypi-repository-url] dist/* to upload the package')\n",
+                              "\tmodule.save('.')\n"
+                              "else:\n"
+                              "\tprint('build failed')"])
 
     @staticmethod
     def read(folder):

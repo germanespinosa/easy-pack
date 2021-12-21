@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 3 
+	return 1, 0, 0
 
 
 def __module_name__():
@@ -23,7 +23,7 @@ def __install_requires__():
 
 
 def __url__():
-	return '' 
+	return 'https://github.com/germanespinosa/easy-pack'
 
 
 def __license__():
@@ -35,7 +35,7 @@ def __license_file__():
 
 
 def __readme_file__():
-	return '../resources/readme.md'
+	return '../resources/readme.md' 
 
 
 def __package_name__():
