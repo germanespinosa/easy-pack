@@ -4,15 +4,15 @@ class EasyPackModule:
                  major=0,
                  minor=0,
                  build_number=0,
-                 name="module_name",
+                 module_name="module_name",
                  package_name="package_name",
                  author="author",
                  author_email="author@email",
                  description="",
                  install_requires="",
-                 licence="",
+                 license="",
                  url="",
-                 licence_file="",
+                 license_file="",
                  readme_file="",
                  files=None,
                  setup_py="",
@@ -21,7 +21,7 @@ class EasyPackModule:
         self.major = 0
         self.minor = 0
         self.build_number = build_number
-        self.name = name
+        self.module_name = module_name
         self.package_name = package_name
         self.author = author
         self.author_email = author_email
@@ -30,9 +30,9 @@ class EasyPackModule:
             self.install_requires = []
         else:
             self.install_requires = install_requires
-        self.licence = licence
+        self.license = license
         self.url = url
-        self.licence_file = licence_file
+        self.license_file = license_file
         self.readme_file = readme_file
         if files is None:
             self.files = []
@@ -45,15 +45,15 @@ class EasyPackModule:
     def version_string(self):
         return str(self.major) + "." + str(self.minor) + "." + str(self.build_number)
 
-    def module_file(self):
-        return self.name + "-" + self.version_string()
+    def package_file(self):
+        return self.package_name + "-" + self.version_string()
 
     def get_module_info_file(self):
         module_info_script = ""
         module_info_script += "def __module_version__():\n"
         module_info_script += "\treturn " + str(self.major) + ", " + str(self.minor) + ", " + str(self.build_number) + " \n\n\n"
         module_info_script += "def __module_name__():\n"
-        module_info_script += "\treturn '" + self.name + "' \n\n\n"
+        module_info_script += "\treturn '" + self.module_name + "' \n\n\n"
         module_info_script += "def __author__():\n"
         module_info_script += "\treturn '" + self.author + "' \n\n\n"
         module_info_script += "def __author_email__():\n"
@@ -64,10 +64,10 @@ class EasyPackModule:
         module_info_script += "\treturn " + str(self.install_requires) + " \n\n\n"
         module_info_script += "def __url__():\n"
         module_info_script += "\treturn '" + self.url + "' \n\n\n"
-        module_info_script += "def __licence__():\n"
-        module_info_script += "\treturn '" + self.licence + "' \n\n\n"
-        module_info_script += "def __licence_file__():\n"
-        module_info_script += "\treturn '" + self.licence_file + "' \n\n\n"
+        module_info_script += "def __license__():\n"
+        module_info_script += "\treturn '" + self.license + "' \n\n\n"
+        module_info_script += "def __license_file__():\n"
+        module_info_script += "\treturn '" + self.license_file + "' \n\n\n"
         module_info_script += "def __readme_file__():\n"
         module_info_script += "\treturn '" + self.readme_file + "' \n\n\n"
         module_info_script += "def __package_name__():\n"
@@ -84,16 +84,50 @@ class EasyPackModule:
         module_info_script += "\treturn '" + self.description + "' \n\n\n"
         return module_info_script
 
-    def save(self, folder=None):
-        if folder is None:
-            folder = self.root_folder
-        else:
-            self.root_folder = folder
-        if folder is None:
-            return False
-        with open(self.root_folder + "/__info__.py", "w") as v:
+    def save(self, folder):
+        with open(folder + "/__info__.py", "w") as v:
             v.write(self.get_module_info_file())
         return True
+
+    @staticmethod
+    def scaffold(folder):
+        import os
+        src = folder + "/src"
+        resources = folder + "/resources"
+        license = resources + "/license.txt"
+        readme = resources + "/readme.md"
+        setup = folder + "/setup"
+        init = src + "/__init__.py"
+        build = folder + "/build.py"
+        if not os.path.exists(src):
+            os.mkdir(src)
+        if not os.path.exists(init):
+            with open(init, "w") as f:
+                f.writelines(["#add imports here"])
+        if not os.path.exists(resources):
+            os.mkdir(resources)
+        if not os.path.exists(license):
+            with open(license, "w") as f:
+                f.writelines(["write your license agreement here"])
+        if not os.path.exists(readme):
+            with open(readme, "w") as f:
+                f.writelines(["#Add your readme in markdown format here"])
+        module = EasyPackModule(readme_file='../resources/readme.md',
+                                license_file='../resources/license.txt',
+                                folder="src")
+        if not os.path.exists(setup):
+            os.mkdir(setup)
+        module.save(folder)
+        if not os.path.exists(build):
+            with open(build, "w") as f:
+                f.writelines(["from easy_pack import EasyPackModule\n",
+                              "from os import path\n\n",
+                              "module = EasyPackModule.read('.')\n",
+                              "if not path.exists('setup/setup.py') or path.getctime('__info__.py') > path.getctime('setup/setup.py'):\n",
+                              "\tprint('package info file has changed, rebuilding setup')\n",
+                              "\tmodule.create_setup_files('../setup')\n",
+                              "module.build_module('python-build')\n",
+                              "module.save('.')\n"])
 
     @staticmethod
     def read(folder):
@@ -119,12 +153,12 @@ class EasyPackModule:
                 module_info.description = info.__description__()
             if "__install_requires__" in content:
                 module_info.install_requires = info.__install_requires__()
-            if "__licence__" in content:
-                module_info.licence = info.__licence__()
+            if "__license__" in content:
+                module_info.license = info.__license__()
             if "__author_email__" in content:
                 module_info.author_email = info.__author_email__()
-            if "__licence_file__" in content:
-                module_info.licence_file = info.__licence_file__()
+            if "__license_file__" in content:
+                module_info.license_file = info.__license_file__()
             if "__readme_file__" in content:
                 module_info.readme_file = info.__readme_file__()
             if "__setup_py__" in content:
@@ -143,7 +177,7 @@ class EasyPackModule:
 
     def get_setup(self):
         setup_py = "from setuptools import setup\n\n"
-        setup_py += "setup(name='" + self.name + "'"
+        setup_py += "setup(name='" + self.module_name + "'"
         if self.description:
             setup_py += ",description='" + self.description + "'"
         if self.url:
@@ -156,12 +190,12 @@ class EasyPackModule:
             setup_py += ",packages=['" + self.package_name + "']"
         if self.install_requires:
             setup_py += ",install_requires=" + str(self.install_requires)
-        if self.licence:
-            setup_py += ",licence='" + self.licence + "'"
+        if self.license:
+            setup_py += ",license='" + self.license + "'"
         setup_py += ",zip_safe=False)\n"
 
         setup_cfg = "[metadata]\n"
-        setup_cfg += "name = " + self.name + "\n"
+        setup_cfg += "name = " + self.module_name + "\n"
         setup_cfg += "version = " + self.version_string() + "\n"
         if self.author:
             setup_cfg += "author = " + self.author + "\n"
@@ -196,12 +230,11 @@ class EasyPackModule:
             return False
 
         self.build_number += 1
-        self.save()
 
         if not os.path.exists(dst):
             os.mkdir(dst)
 
-        destination = dst + "/" + self.module_file()
+        destination = dst + "/" + self.package_file()
         if not os.path.exists(destination):
             os.mkdir(destination)
 
@@ -209,7 +242,8 @@ class EasyPackModule:
         copy(self.root_folder + "/" + self.setup_py, destination)
 
         module_folder = destination + "/" + self.package_name
-        os.mkdir(module_folder)
+        if not os.path.exists(module_folder):
+            os.mkdir(module_folder)
 
         copy(self.root_folder + "/" + self.setup_cfg, module_folder)
 
@@ -221,9 +255,10 @@ class EasyPackModule:
         if self.readme_file:
             copy(self.root_folder + "/" + self.readme_file, module_folder)
 
-        if self.licence_file:
-            copy(self.root_folder + "/" + self.licence_file, module_folder)
+        if self.license_file:
+            copy(self.root_folder + "/" + self.license_file, module_folder)
 
-        import tarfile
-        with tarfile.open(destination + ".tar.gz", "w:gz") as tar:
-            tar.add(destination, arcname=os.path.basename(destination))
+        import subprocess
+        p = subprocess.Popen(["python3", "setup.py", "sdist"], cwd=destination)
+        p.wait()
+        return True

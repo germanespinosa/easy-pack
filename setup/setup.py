@@ -1,3 +1,3 @@
 from setuptools import setup
 
-setup(name='module_name',author='german espinosa',author_email='germanespinosa@gmail.com',packages=['module_management'],install_requires=['twine'],licence='MIT',zip_safe=False)
+setup(name='easy-pack',description='easy packing!',author='german espinosa',author_email='germanespinosa@gmail.com',packages=['easy_pack'],install_requires=['twine'],license='MIT',zip_safe=False)
