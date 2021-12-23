@@ -235,8 +235,6 @@ class EasyPackModule:
         if not self.setup_cfg:
             return False
 
-        self.build_number += 1
-
         if not os.path.exists(dst):
             os.mkdir(dst)
 
@@ -267,4 +265,5 @@ class EasyPackModule:
         import subprocess
         p = subprocess.Popen(["python3", "setup.py", "sdist"], cwd=destination)
         p.wait()
+        self.build_number += 1
         return True
