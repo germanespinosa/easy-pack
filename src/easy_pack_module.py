@@ -90,7 +90,7 @@ class EasyPackModule:
         return True
 
     @staticmethod
-    def scaffold(folder):
+    def scaffold(folder='.'):
         import os
         if not os.path.exists(folder):
             os.mkdir(folder)
@@ -122,7 +122,8 @@ class EasyPackModule:
         module.save(folder)
         if not os.path.exists(build):
             with open(build, "w") as f:
-                f.writelines(["from easy_pack import EasyPackModule\n",
+                f.writelines(["#!/bin/python3\n",
+                              "from easy_pack import EasyPackModule\n",
                               "from os import path\n\n",
                               "module = EasyPackModule.read('.')\n",
                               "if not path.exists('setup/setup.py') or path.getctime('__info__.py') > path.getctime('setup/setup.py'):\n",

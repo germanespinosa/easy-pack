@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 1 
+	return 1, 0, 5 
 
 
 def __module_name__():
