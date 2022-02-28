@@ -123,18 +123,35 @@ class EasyPackModule:
         if not os.path.exists(build):
             with open(build, "w") as f:
                 f.writelines(["#!/bin/python3\n",
-                              "from easy_pack import EasyPackModule\n",
-                              "from os import path\n\n",
-                              "module = EasyPackModule.read('.')\n",
-                              "if not path.exists('setup/setup.py') or path.getctime('__info__.py') > path.getctime('setup/setup.py'):\n",
-                              "\tprint('package info file has changed, rebuilding setup')\n",
-                              "\tmodule.create_setup_files('../setup')\n",
-                              "if module.build_module('python-build'):\n",
-                              "\tprint('build succeded')\n",
-                              "\tprint('use twine upload --repository-url [pypi-repository-url] dist/* to upload the package')\n",
-                              "\tmodule.save('.')\n"
-                              "else:\n"
-                              "\tprint('build failed')"])
+                "import sys\n",
+                "from easy_pack import EasyPackModule\n",
+                "from os import path\n\n",
+                "module = EasyPackModule.read('.')\n",
+                "if not path.exists('setup/setup.py') or path.getctime('__info__.py') > path.getctime('setup/setup.py'):\n",
+                "\tprint('package info file has changed, rebuilding setup')\n",
+                "module.create_setup_files('../setup')\n",
+                "build = module.build_module('python-build')\n",
+                "if build:\n",
+                "\tprint('build succeded')\n",
+                "\tif '-upload' in sys.argv:\n",
+                "\t\timport os\n",
+                "\tusername = ''\n",
+                "\tif '-user' in sys.argv:\n",
+                "\t\tusername = sys.argv[sys.argv.index('-user')+1]\n",
+                "\tpassword = ''\n",
+                "\tif '-password' in sys.argv:\n",
+                "\t\tpassword = sys.argv[sys.argv.index('-password')+1]\n",
+                "\trepository = ''\n",
+                "\tif '-repository' in sys.argv:\n",
+                "\t\trepository = sys.argv[sys.argv.index('-repository')+1]\n",
+                "\tos.system('cd ' + build + '; twine upload dist/*' + ((' --repository-url  ' + repository) if repository else '') + ((' -u ' + username) if username else '') + ((' -p ' + password) if password else ''))\n",
+                "\telse:\n",
+                "\t\tprint('use twine upload --repository-url [pypi-repository-url] dist/* to upload the package')\n",
+                "\tif '-install' in sys.argv:\n",
+                "\t\tos.system('cd ' + build + '; pip install .')\n",
+                "\tmodule.save('.')\n",
+                "else:\n",
+                "print('build failed')\n"])
 
     @staticmethod
     def read(folder):
@@ -267,4 +284,4 @@ class EasyPackModule:
         p = subprocess.Popen(["python3", "setup.py", "sdist"], cwd=destination)
         p.wait()
         self.build_number += 1
-        return True
+        return destination
