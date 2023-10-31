@@ -124,6 +124,7 @@ class EasyPackModule:
             with open(build, "w") as f:
                 f.writelines(["#!/bin/python3\n",
                 "import sys\n",
+                "import os\n",
                 "from easy_pack import EasyPackModule\n",
                 "from os import path\n\n",
                 "module = EasyPackModule.read('.')\n",
@@ -202,8 +203,12 @@ class EasyPackModule:
     def get_setup(self):
         setup_py = "from setuptools import setup\n\n"
         if self.readme_file:
-            setup_py += "with open('./" + self.package_name + "/" + self.readme_file.split("/")[-1] + "') as f:\n"
-            setup_py += "\tlong_description = f.read()\n\n"
+            setup_py += "import os\n"
+            setup_py += "if os.path.isfile('./" + self.package_name + "/" + self.readme_file.split("/")[-1] + "'):\n"
+            setup_py += "\twith open('./" + self.package_name + "/" + self.readme_file.split("/")[-1] + "') as f:\n"
+            setup_py += "\t\tlong_description = f.read()\n"
+            setup_py += "else:\n"
+            setup_py += "\tlong_description = ''\n"
         setup_py += "setup(name='" + self.module_name + "'"
         if self.description:
             setup_py += ",description='" + self.description + "'"
