@@ -201,6 +201,9 @@ class EasyPackModule:
 
     def get_setup(self):
         setup_py = "from setuptools import setup\n\n"
+        if self.readme_file:
+            setup_py += "with open('./" + self.package_name + "/" + self.readme_file.split("/")[-1] + "') as f:\n"
+            setup_py += "\tlong_description = f.read()\n\n"
         setup_py += "setup(name='" + self.module_name + "'"
         if self.description:
             setup_py += ",description='" + self.description + "'"
@@ -210,6 +213,9 @@ class EasyPackModule:
             setup_py += ",author='" + self.author + "'"
         if self.author_email:
             setup_py += ",author_email='" + self.author_email + "'"
+        if self.readme_file:
+            setup_py += ",long_description=long_description"
+            setup_py += ",long_description_content_type='text/markdown'"
         if self.package_name:
             setup_py += ",packages=['" + self.package_name + "']"
         if self.install_requires:
