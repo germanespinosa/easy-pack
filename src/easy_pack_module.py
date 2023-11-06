@@ -1,3 +1,15 @@
+
+def read_additional_files(path, d):
+    import os
+    l = [d + "/*"]
+    for f in os.listdir(path + d):
+        fn = d+"/"+f
+        print(fn)
+        if os.path.isdir(fn):
+            l += read_additional_files(path, fn)
+    return l
+
+
 class EasyPackModule:
 
     def __init__(self,
@@ -26,6 +38,7 @@ class EasyPackModule:
         self.author = author
         self.author_email = author_email
         self.description = description
+        self.additional_files = 'files'
         if install_requires is None:
             self.install_requires = []
         else:
@@ -74,6 +87,8 @@ class EasyPackModule:
         module_info_script += "\treturn '" + self.package_name + "' \n\n\n"
         module_info_script += "def __files__():\n"
         module_info_script += "\treturn " + str(self.files) + " \n\n\n"
+        module_info_script += "def __additional_files__():\n"
+        module_info_script += "\treturn '" + str(self.additional_files) + "' \n\n\n"
         module_info_script += "def __setup_py__():\n"
         module_info_script += "\treturn '" + self.setup_py + "' \n\n\n"
         module_info_script += "def __setup_cfg__():\n"
@@ -117,6 +132,10 @@ class EasyPackModule:
         module = EasyPackModule(readme_file='../resources/readme.md',
                                 license_file='../resources/license.txt',
                                 folder="src")
+        additional_files = folder + "/" + module.additional_files
+        if not os.path.exists(additional_files):
+            os.mkdir(setup)
+
         if not os.path.exists(setup):
             os.mkdir(setup)
         module.save(folder)
@@ -190,6 +209,8 @@ class EasyPackModule:
                 module_info.setup_py = info.__setup_py__()
             if "__files__" in content:
                 module_info.files = info.__files__()
+            if "__additional_files__" in content:
+                module_info.additional_files = info.__additional_files__()
             if "__setup_cfg__" in content:
                 module_info.setup_cfg = info.__setup_cfg__()
             if "__root_folder__" in content:
@@ -227,6 +248,10 @@ class EasyPackModule:
             setup_py += ",install_requires=" + str(self.install_requires)
         if self.license:
             setup_py += ",license='" + self.license + "'"
+        if self.additional_files:
+            import os
+            folder_list = read_additional_files(self.root_folder + "/../", self.additional_files)
+            setup_py += ",package_data={'" + self.package_name + "':" + str(folder_list) + "}"
         setup_py += ",version='" + self.version_string() + "',zip_safe=False)\n"
 
         setup_cfg = "[metadata]\n"
@@ -271,7 +296,7 @@ class EasyPackModule:
         if not os.path.exists(destination):
             os.mkdir(destination)
 
-        from shutil import copy
+        from shutil import copy, copytree
         copy(self.root_folder + "/" + self.setup_py, destination)
 
         module_folder = destination + "/" + self.package_name
@@ -281,6 +306,10 @@ class EasyPackModule:
         copy(self.root_folder + "/" + self.setup_cfg, module_folder)
 
         copy(self.root_folder + "/__init__.py", module_folder)
+
+        if self.additional_files:
+            print(self.root_folder + "/../" + self.additional_files,  module_folder)
+            copytree(self.root_folder + "/../" + self.additional_files,  module_folder + "/files")
 
         for f in self.files:
             copy(self.root_folder + "/" + f, module_folder)
