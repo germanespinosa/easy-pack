@@ -114,6 +114,7 @@ class EasyPackModule:
         license = resources + "/license.txt"
         readme = resources + "/readme.md"
         setup = folder + "/setup"
+        additional_files = folder + "/files"
         init = src + "/__init__.py"
         build = folder + "/build.py"
         if not os.path.exists(src):
@@ -134,8 +135,7 @@ class EasyPackModule:
                                 folder="src")
         additional_files = folder + "/" + module.additional_files
         if not os.path.exists(additional_files):
-            os.mkdir(setup)
-
+            os.mkdir(additional_files)
         if not os.path.exists(setup):
             os.mkdir(setup)
         module.save(folder)
@@ -211,6 +211,8 @@ class EasyPackModule:
                 module_info.files = info.__files__()
             if "__additional_files__" in content:
                 module_info.additional_files = info.__additional_files__()
+            else:
+                module_info.additional_files = ''
             if "__setup_cfg__" in content:
                 module_info.setup_cfg = info.__setup_cfg__()
             if "__root_folder__" in content:
