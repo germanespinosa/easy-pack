@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 52 
+	return 1, 0, 53 
 
 
 def __module_name__():
@@ -47,7 +47,7 @@ def __files__():
 
 
 def __additional_files__():
-	return 'files' 
+	return files 
 
 
 def __setup_py__():

@@ -88,7 +88,7 @@ class EasyPackModule:
         module_info_script += "def __files__():\n"
         module_info_script += "\treturn " + str(self.files) + " \n\n\n"
         module_info_script += "def __additional_files__():\n"
-        module_info_script += "\treturn '" + str(self.additional_files) + "' \n\n\n"
+        module_info_script += "\treturn " + str(self.additional_files) + " \n\n\n"
         module_info_script += "def __setup_py__():\n"
         module_info_script += "\treturn '" + self.setup_py + "' \n\n\n"
         module_info_script += "def __setup_cfg__():\n"
