@@ -109,14 +109,6 @@ def __package_name__():
 	return 'package_name' 
 ```
 
-####Package files:
-Returns a list of strings with the files that must be included in the package:
-```
-def __files__():
-	return ["file1.py","file2.py","file3.png"] 
-```
-
-
 ####Module description:
 Returns a string with a brief description of your module:
 ```

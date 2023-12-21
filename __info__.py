@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 8 
+	return 1, 0, 35
 
 
 def __module_name__():
@@ -42,8 +42,8 @@ def __package_name__():
 	return 'easy_pack' 
 
 
-def __files__():
-	return ['easy_pack_module.py'] 
+def __additional_files__():
+	return [] 
 
 
 def __setup_py__():
@@ -60,5 +60,3 @@ def __root_folder__():
 
 def __description__():
 	return 'easy packing!' 
-
-

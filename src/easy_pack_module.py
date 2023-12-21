@@ -14,7 +14,7 @@ class EasyPackModule:
                  url="",
                  license_file="",
                  readme_file="",
-                 files=None,
+                 additional_files=None,
                  setup_py="",
                  setup_cfg="",
                  folder=""):
@@ -34,10 +34,10 @@ class EasyPackModule:
         self.url = url
         self.license_file = license_file
         self.readme_file = readme_file
-        if files is None:
-            self.files = []
+        if additional_files is None:
+            self.additional_files = []
         else:
-            self.files = files
+            self.additional_files = additional_files
         self.setup_py = setup_py
         self.setup_cfg = setup_cfg
         self.root_folder = folder
@@ -72,8 +72,8 @@ class EasyPackModule:
         module_info_script += "\treturn '" + self.readme_file + "' \n\n\n"
         module_info_script += "def __package_name__():\n"
         module_info_script += "\treturn '" + self.package_name + "' \n\n\n"
-        module_info_script += "def __files__():\n"
-        module_info_script += "\treturn " + str(self.files) + " \n\n\n"
+        module_info_script += "def __additional_files__():\n"
+        module_info_script += "\treturn " + str(self.additional_files) + " \n\n\n"
         module_info_script += "def __setup_py__():\n"
         module_info_script += "\treturn '" + self.setup_py + "' \n\n\n"
         module_info_script += "def __setup_cfg__():\n"
@@ -187,8 +187,8 @@ class EasyPackModule:
                 module_info.readme_file = info.__readme_file__()
             if "__setup_py__" in content:
                 module_info.setup_py = info.__setup_py__()
-            if "__files__" in content:
-                module_info.files = info.__files__()
+            if "__additional_files__" in content:
+                module_info.additional_files = info.__additional_files__()
             if "__setup_cfg__" in content:
                 module_info.setup_cfg = info.__setup_cfg__()
             if "__root_folder__" in content:
@@ -214,6 +214,23 @@ class EasyPackModule:
             setup_py += ",packages=['" + self.package_name + "']"
         if self.install_requires:
             setup_py += ",install_requires=" + str(self.install_requires)
+        if self.additional_files:
+            setup_py += ",data_files=[('files',["
+            first = True
+            for af in self.additional_files:
+                if not first:
+                    setup_py += ","
+                setup_py += "'" + self.module_name + "/files/" + af + "'"
+                first = False
+            setup_py += "])]"
+            setup_py += ",package_data={'files':["
+            first = True
+            for af in self.additional_files:
+                if not first:
+                    setup_py += ","
+                setup_py += "'" + self.module_name + "/files/" + af + "'"
+                first = False
+            setup_py += "]}, include_package_data=True"
         if self.license:
             setup_py += ",license='" + self.license + "'"
         setup_py += ",version='" + self.version_string() + "',zip_safe=False)\n"
@@ -260,19 +277,24 @@ class EasyPackModule:
         if not os.path.exists(destination):
             os.mkdir(destination)
 
-        from shutil import copy
+        from shutil import copy, copytree
         copy(self.root_folder + "/" + self.setup_py, destination)
 
         module_folder = destination + "/" + self.package_name
+
+        copytree(self.root_folder, module_folder)
+
         if not os.path.exists(module_folder):
             os.mkdir(module_folder)
 
         copy(self.root_folder + "/" + self.setup_cfg, module_folder)
 
-        copy(self.root_folder + "/__init__.py", module_folder)
-
-        for f in self.files:
-            copy(self.root_folder + "/" + f, module_folder)
+        if self.additional_files:
+            additional_files_folder = module_folder + "/files"
+            if not os.path.exists(additional_files_folder):
+                os.mkdir(additional_files_folder)
+            for f in self.additional_files:
+                copy(self.root_folder + "/../files/" + f, additional_files_folder)
 
         if self.readme_file:
             copy(self.root_folder + "/" + self.readme_file, module_folder)
@@ -281,7 +303,8 @@ class EasyPackModule:
             copy(self.root_folder + "/" + self.license_file, module_folder)
 
         import subprocess
-        p = subprocess.Popen(["python3", "setup.py", "sdist"], cwd=destination)
+        import sys
+        p = subprocess.Popen([sys.executable, "setup.py", "sdist"], cwd=destination)
         p.wait()
         self.build_number += 1
         return destination
