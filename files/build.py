@@ -1,7 +1,7 @@
 #!/bin/python3
 
 import sys
-from src import EasyPackModule
+from easy_pack import EasyPackModule
 from os import path
 
 module = EasyPackModule.read('.')
