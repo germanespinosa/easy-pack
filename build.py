@@ -1,5 +1,6 @@
 #!/bin/python3
 import sys
+import os
 from src import EasyPackModule
 from os import path
 
