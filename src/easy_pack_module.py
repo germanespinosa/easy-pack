@@ -1,20 +1,7 @@
 
-def read_additional_files(path, d):
-    import os
-    l = [d + "/*"]
-    for f in os.listdir(path + d):
-        fn = d+"/"+f
-        print(fn)
-        if os.path.isdir(fn):
-            l += read_additional_files(path, fn)
-    return l
-
-
 class EasyPackModule:
 
     def __init__(self,
-                 major=0,
-                 minor=0,
                  build_number=0,
                  module_name="module_name",
                  package_name="package_name",
@@ -110,8 +97,7 @@ class EasyPackModule:
         src = folder + "/src"
         resources = folder + "/resources"
         license = resources + "/license.txt"
-        readme = resources + "/readme.md"
-        setup = folder + "/setup"
+        readme = resources + "/README.md"
         additional_files = folder + "/files"
         init = src + "/__init__.py"
         build = folder + "/build.py"
@@ -128,14 +114,12 @@ class EasyPackModule:
         if not os.path.exists(readme):
             with open(readme, "w") as f:
                 f.writelines(["#Add your readme in markdown format here"])
-        module = EasyPackModule(readme_file='../resources/readme.md',
+        module = EasyPackModule(readme_file='../resources/README.md',
                                 license_file='../resources/license.txt',
                                 folder="src")
         additional_files = folder + "/" + module.additional_files
         if not os.path.exists(additional_files):
             os.mkdir(additional_files)
-        if not os.path.exists(setup):
-            os.mkdir(setup)
         module.save(folder)
         if not os.path.exists(build):
             with open(build, "w") as f:
@@ -147,7 +131,6 @@ class EasyPackModule:
                 "module = EasyPackModule.read('.')\n",
                 "if not path.exists('setup/setup.py') or path.getctime('__info__.py') > path.getctime('setup/setup.py'):\n",
                 "\tprint('package info file has changed, rebuilding setup')\n",
-                "module.create_setup_files('../setup')\n",
                 "build = module.build_module('python-build')\n",
                 "if build:\n",
                 "\tprint('build succeded')\n",
@@ -211,6 +194,8 @@ class EasyPackModule:
                 module_info.setup_cfg = info.__setup_cfg__()
             if "__root_folder__" in content:
                 module_info.root_folder = info.__root_folder__()
+            if "__url__" in content:
+                module_info.url = info.__url__()
             if must_remove:
                 sys.path.remove(folder)
             return module_info
@@ -218,50 +203,43 @@ class EasyPackModule:
             return None
 
     def get_setup(self):
-        setup_py = "from setuptools import setup\n\n"
-        if self.readme_file:
-            setup_py += "import os\n"
-            setup_py += "if os.path.isfile('./" + self.package_name + "/" + self.readme_file.split("/")[-1] + "'):\n"
-            setup_py += "\twith open('./" + self.package_name + "/" + self.readme_file.split("/")[-1] + "') as f:\n"
-            setup_py += "\t\tlong_description = f.read()\n"
-            setup_py += "else:\n"
-            setup_py += "\tlong_description = ''\n"
-        setup_py += "setup(name='" + self.module_name + "'"
+        setup_py = "from setuptools import setup\n"
+        setup_py += "\nsetup(name='" + self.module_name + "',\n"
         if self.description:
-            setup_py += ",description='" + self.description + "'"
+            setup_py += "      description='" + self.description + "',\n"
         if self.url:
-            setup_py += ",url='" + self.url + "'"
+            setup_py += "      url='" + self.url + "',\n"
         if self.author:
-            setup_py += ",author='" + self.author + "'"
+            setup_py += "      author='" + self.author + "',\n"
         if self.author_email:
-            setup_py += ",author_email='" + self.author_email + "'"
+            setup_py += "      author_email='" + self.author_email + "',\n"
         if self.readme_file:
-            setup_py += ",long_description=long_description"
-            setup_py += ",long_description_content_type='text/markdown'"
+            setup_py += "      long_description=open('./" + self.package_name + "/" + self.readme_file.split("/")[-1] + "').read(),\n"
+            setup_py += "      long_description_content_type='text/markdown',\n"
         if self.package_name:
-            setup_py += ",packages=['" + self.package_name + "']"
+            setup_py += "      packages=['" + self.package_name + "'],\n"
         if self.install_requires:
-            setup_py += ",install_requires=" + str(self.install_requires)
+            setup_py += "      install_requires=" + str(self.install_requires) + ",\n"
         if self.additional_files:
-            setup_py += ",data_files=[('files',["
+            setup_py += "      data_files=[('files',["
             first = True
             for af in self.additional_files:
                 if not first:
                     setup_py += ","
                 setup_py += "'" + self.module_name + "/files/" + af + "'"
                 first = False
-            setup_py += "])]"
-            setup_py += ",package_data={'files':["
+            setup_py += "])],\n"
+            setup_py += "      ,package_data={'files':["
             first = True
             for af in self.additional_files:
                 if not first:
                     setup_py += ","
                 setup_py += "'" + self.module_name + "/files/" + af + "'"
                 first = False
-            setup_py += "]}, include_package_data=True"
+            setup_py += "]},\n      include_package_data=True,\n"
         if self.license:
-            setup_py += ",license='" + self.license + "'"
-        setup_py += ",version='" + self.version_string() + "',zip_safe=False)\n"
+            setup_py += "      license='" + self.license + "',\n"
+        setup_py += "      version='" + self.version_string() + "',\n      zip_safe=False)\n"
 
         setup_cfg = "[metadata]\n"
         setup_cfg += "name = " + self.module_name + "\n"
@@ -275,15 +253,11 @@ class EasyPackModule:
 
         return setup_py, setup_cfg
 
-    def create_setup_files(self, dst=""):
-        if dst:
-            dst += "/"
+    def create_setup_files(self, destination: str, module_folder: str):
         setup_py, setup_cfg = self.get_setup()
-        self.setup_py = dst + "setup.py"
-        with open(self.root_folder + "/" + self.setup_py, "w") as m:
+        with open(destination + "/setup.py" , "w") as m:
             m.writelines([setup_py])
-        self.setup_cfg = dst + "setup.cfg"
-        with open(self.root_folder + "/" + self.setup_cfg, "w") as m:
+        with open(module_folder + "/setup.cfg", "w") as m:
             m.writelines([setup_cfg])
 
     def build_module(self, dst):
@@ -306,7 +280,6 @@ class EasyPackModule:
             os.mkdir(destination)
 
         from shutil import copy, copytree
-        copy(self.root_folder + "/" + self.setup_py, destination)
 
         module_folder = destination + "/" + self.package_name
 
@@ -314,8 +287,6 @@ class EasyPackModule:
 
         if not os.path.exists(module_folder):
             os.mkdir(module_folder)
-
-        copy(self.root_folder + "/" + self.setup_cfg, module_folder)
 
         if self.additional_files:
             additional_files_folder = module_folder + "/files"
@@ -326,9 +297,12 @@ class EasyPackModule:
 
         if self.readme_file:
             copy(self.root_folder + "/" + self.readme_file, module_folder)
+            copy(self.root_folder + "/" + self.readme_file, destination)
 
         if self.license_file:
             copy(self.root_folder + "/" + self.license_file, module_folder)
+
+        self.create_setup_files(destination=destination, module_folder=module_folder)
 
         import subprocess
         import sys

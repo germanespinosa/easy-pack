@@ -18,12 +18,9 @@ project_folder
 │   │   __init__.py    # module 
 │
 └───resources
-│   │   license.txt    # license file (txt format)
-│   │   readme.md      # readme (mark-down format)
-│   
-└───setup
-    │   setup.cfg      # required for setup do not modify 
-    │   setup.py       # required for setup do not modify
+    │   license.txt    # license file (txt format)
+    │   readme.md      # readme (mark-down format)
+   
 ```
 
 ##The __info__.py file
@@ -99,7 +96,7 @@ def __license_file__():
 Returns a string with the relative path (from the module folder) to the readme file:
 ```
 def __readme_file__():
-	return '../resources/readme.md' 
+	return '../resources/README.md' 
 ```
 
 ####Package name:
@@ -142,6 +139,7 @@ project_folder
         │   │   requires.txt  
         │   │   SOURCES.txt  
         │   │   top_level.txt  
+        │   README.md                         # readme file
         │   setup.py                          # setup
         
 ```
