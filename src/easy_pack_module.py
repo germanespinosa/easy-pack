@@ -1,3 +1,11 @@
+def get_module_folder() -> str:
+    import importlib.util
+
+    spec = importlib.util.find_spec('easy_pack')
+    if spec:
+        return spec.submodule_search_locations[0].replace("\\","/").replace("//","/")
+    else:
+        return "."
 
 class EasyPackModule:
 
@@ -51,37 +59,37 @@ class EasyPackModule:
     def get_module_info_file(self):
         module_info_script = ""
         module_info_script += "def __module_version__():\n"
-        module_info_script += "\treturn " + str(self.major) + ", " + str(self.minor) + ", " + str(self.build_number) + " \n\n\n"
+        module_info_script += "\treturn " + str(self.major) + ", " + str(self.minor) + ", " + str(self.build_number) + " \n\n"
         module_info_script += "def __module_name__():\n"
-        module_info_script += "\treturn '" + self.module_name + "' \n\n\n"
+        module_info_script += "\treturn '" + self.module_name + "' \n\n"
         module_info_script += "def __author__():\n"
-        module_info_script += "\treturn '" + self.author + "' \n\n\n"
+        module_info_script += "\treturn '" + self.author + "' \n\n"
         module_info_script += "def __author_email__():\n"
-        module_info_script += "\treturn '" + self.author_email + "' \n\n\n"
+        module_info_script += "\treturn '" + self.author_email + "' \n\n"
         module_info_script += "def __package_description__():\n"
-        module_info_script += "\treturn '" + self.description + "' \n\n\n"
+        module_info_script += "\treturn '" + self.description + "' \n\n"
         module_info_script += "def __install_requires__():\n"
-        module_info_script += "\treturn " + str(self.install_requires) + " \n\n\n"
+        module_info_script += "\treturn " + str(self.install_requires) + " \n\n"
         module_info_script += "def __url__():\n"
-        module_info_script += "\treturn '" + self.url + "' \n\n\n"
+        module_info_script += "\treturn '" + self.url + "' \n\n"
         module_info_script += "def __license__():\n"
-        module_info_script += "\treturn '" + self.license + "' \n\n\n"
+        module_info_script += "\treturn '" + self.license + "' \n\n"
         module_info_script += "def __license_file__():\n"
-        module_info_script += "\treturn '" + self.license_file + "' \n\n\n"
+        module_info_script += "\treturn '" + self.license_file + "' \n\n"
         module_info_script += "def __readme_file__():\n"
-        module_info_script += "\treturn '" + self.readme_file + "' \n\n\n"
+        module_info_script += "\treturn '" + self.readme_file + "' \n\n"
         module_info_script += "def __package_name__():\n"
-        module_info_script += "\treturn '" + self.package_name + "' \n\n\n"
+        module_info_script += "\treturn '" + self.package_name + "' \n\n"
         module_info_script += "def __additional_files__():\n"
-        module_info_script += "\treturn " + str(self.additional_files) + " \n\n\n"
+        module_info_script += "\treturn False\n\n"
         module_info_script += "def __setup_py__():\n"
-        module_info_script += "\treturn '" + self.setup_py + "' \n\n\n"
+        module_info_script += "\treturn '" + self.setup_py + "' \n\n"
         module_info_script += "def __setup_cfg__():\n"
-        module_info_script += "\treturn '" + self.setup_cfg + "' \n\n\n"
+        module_info_script += "\treturn '" + self.setup_cfg + "' \n\n"
         module_info_script += "def __root_folder__():\n"
-        module_info_script += "\treturn '" + self.root_folder + "' \n\n\n"
+        module_info_script += "\treturn '" + self.root_folder + "' \n\n"
         module_info_script += "def __description__():\n"
-        module_info_script += "\treturn '" + self.description + "' \n\n\n"
+        module_info_script += "\treturn '" + self.description + "' \n\n"
         return module_info_script
 
     def save(self, folder):
@@ -98,7 +106,7 @@ class EasyPackModule:
         resources = folder + "/resources"
         license = resources + "/license.txt"
         readme = resources + "/README.md"
-        additional_files = folder + "/files"
+        files = folder + "/files"
         init = src + "/__init__.py"
         build = folder + "/build.py"
         if not os.path.exists(src):
@@ -117,42 +125,13 @@ class EasyPackModule:
         module = EasyPackModule(readme_file='../resources/README.md',
                                 license_file='../resources/license.txt',
                                 folder="src")
-        additional_files = folder + "/" + module.additional_files
-        if not os.path.exists(additional_files):
-            os.mkdir(additional_files)
+        if not os.path.exists(files):
+            os.mkdir(files)
         module.save(folder)
-        if not os.path.exists(build):
-            with open(build, "w") as f:
-                f.writelines(["#!/bin/python3\n",
-                "import sys\n",
-                "import os\n",
-                "from easy_pack import EasyPackModule\n",
-                "from os import path\n\n",
-                "module = EasyPackModule.read('.')\n",
-                "if not path.exists('setup/setup.py') or path.getctime('__info__.py') > path.getctime('setup/setup.py'):\n",
-                "\tprint('package info file has changed, rebuilding setup')\n",
-                "build = module.build_module('python-build')\n",
-                "if build:\n",
-                "\tprint('build succeded')\n",
-                "\tif '-upload' in sys.argv:\n",
-                "\t\timport os\n",
-                "\t\tusername = ''\n",
-                "\t\tif '-user' in sys.argv:\n",
-                "\t\t\tusername = sys.argv[sys.argv.index('-user')+1]\n",
-                "\t\tpassword = ''\n",
-                "\t\tif '-password' in sys.argv:\n",
-                "\t\t\tpassword = sys.argv[sys.argv.index('-password')+1]\n",
-                "\t\trepository = ''\n",
-                "\t\tif '-repository' in sys.argv:\n",
-                "\t\t\trepository = sys.argv[sys.argv.index('-repository')+1]\n",
-                "\t\tos.system('cd ' + build + '; twine upload dist/*' + ((' --repository-url  ' + repository) if repository else '') + ((' -u ' + username) if username else '') + ((' -p ' + password) if password else ''))\n",
-                "\telse:\n",
-                "\t\tprint('use twine upload --repository-url [pypi-repository-url] dist/* to upload the package')\n",
-                "\tif '-install' in sys.argv:\n",
-                "\t\tos.system('cd ' + build + '; pip install .')\n",
-                "\tmodule.save('.')\n",
-                "else:\n",
-                "\tprint('build failed')\n"])
+        from shutil import copy
+        module_folder = get_module_folder()
+        build_file = module_folder + "/files/build.py"
+        copy (build_file, build)
 
     @staticmethod
     def read(folder):
@@ -221,22 +200,7 @@ class EasyPackModule:
         if self.install_requires:
             setup_py += "      install_requires=" + str(self.install_requires) + ",\n"
         if self.additional_files:
-            setup_py += "      data_files=[('files',["
-            first = True
-            for af in self.additional_files:
-                if not first:
-                    setup_py += ","
-                setup_py += "'" + self.module_name + "/files/" + af + "'"
-                first = False
-            setup_py += "])],\n"
-            setup_py += "      ,package_data={'files':["
-            first = True
-            for af in self.additional_files:
-                if not first:
-                    setup_py += ","
-                setup_py += "'" + self.module_name + "/files/" + af + "'"
-                first = False
-            setup_py += "]},\n      include_package_data=True,\n"
+            setup_py += "      include_package_data=True,\n"
         if self.license:
             setup_py += "      license='" + self.license + "',\n"
         setup_py += "      version='" + self.version_string() + "',\n      zip_safe=False)\n"
@@ -275,7 +239,9 @@ class EasyPackModule:
         if not os.path.exists(dst):
             os.mkdir(dst)
 
+
         destination = dst + "/" + self.package_file()
+
         if not os.path.exists(destination):
             os.mkdir(destination)
 
@@ -284,6 +250,9 @@ class EasyPackModule:
         module_folder = destination + "/" + self.package_name
 
         copytree(self.root_folder, module_folder)
+
+        if self.additional_files:
+            open(destination + "/MANIFEST.in", "w").write("recursive-include " + self.package_name + "/files *\n")
 
         if not os.path.exists(module_folder):
             os.mkdir(module_folder)
