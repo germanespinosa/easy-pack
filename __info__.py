@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 77 
+	return 1, 0, 80 
 
 def __module_name__():
 	return 'easy-pack' 
@@ -30,9 +30,6 @@ def __readme_file__():
 
 def __package_name__():
 	return 'easy_pack' 
-
-def __additional_files__():
-	return False
 
 def __setup_py__():
 	return '../setup/setup.py' 
