@@ -191,7 +191,9 @@ class EasyPackModule:
             setup_py += "      install_requires=" + str(self.install_requires) + ",\n"
         if self.license:
             setup_py += "      license='" + self.license + "',\n"
-        setup_py += "      version='" + self.version_string() + "',\n      zip_safe=False)\n"
+        setup_py += "      include_package_data=True,\n"
+        setup_py += "      version='" + self.version_string() + "',\n"
+        setup_py += "      zip_safe=False)\n"
 
         setup_cfg = "[metadata]\n"
         setup_cfg += "name = " + self.module_name + "\n"

@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 80 
+	return 1, 0, 82 
 
 def __module_name__():
 	return 'easy-pack' 
