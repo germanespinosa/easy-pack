@@ -21,7 +21,6 @@ class EasyPackModule:
                  url="",
                  license_file="",
                  readme_file="",
-                 additional_files=None,
                  setup_py="",
                  setup_cfg="",
                  folder=""):
@@ -33,7 +32,6 @@ class EasyPackModule:
         self.author = author
         self.author_email = author_email
         self.description = description
-        self.additional_files = 'files'
         if install_requires is None:
             self.install_requires = []
         else:
@@ -42,10 +40,6 @@ class EasyPackModule:
         self.url = url
         self.license_file = license_file
         self.readme_file = readme_file
-        if additional_files is None:
-            self.additional_files = []
-        else:
-            self.additional_files = additional_files
         self.setup_py = setup_py
         self.setup_cfg = setup_cfg
         self.root_folder = folder
@@ -80,8 +74,6 @@ class EasyPackModule:
         module_info_script += "\treturn '" + self.readme_file + "' \n\n"
         module_info_script += "def __package_name__():\n"
         module_info_script += "\treturn '" + self.package_name + "' \n\n"
-        module_info_script += "def __additional_files__():\n"
-        module_info_script += "\treturn False\n\n"
         module_info_script += "def __setup_py__():\n"
         module_info_script += "\treturn '" + self.setup_py + "' \n\n"
         module_info_script += "def __setup_cfg__():\n"
@@ -167,8 +159,6 @@ class EasyPackModule:
                 module_info.readme_file = info.__readme_file__()
             if "__setup_py__" in content:
                 module_info.setup_py = info.__setup_py__()
-            if "__additional_files__" in content:
-                module_info.additional_files = info.__additional_files__()
             if "__setup_cfg__" in content:
                 module_info.setup_cfg = info.__setup_cfg__()
             if "__root_folder__" in content:
@@ -199,8 +189,6 @@ class EasyPackModule:
             setup_py += "      packages=['" + self.package_name + "'],\n"
         if self.install_requires:
             setup_py += "      install_requires=" + str(self.install_requires) + ",\n"
-        if self.additional_files:
-            setup_py += "      include_package_data=True,\n"
         if self.license:
             setup_py += "      license='" + self.license + "',\n"
         setup_py += "      version='" + self.version_string() + "',\n      zip_safe=False)\n"
@@ -251,18 +239,10 @@ class EasyPackModule:
 
         copytree(self.root_folder, module_folder)
 
-        if self.additional_files:
-            open(destination + "/MANIFEST.in", "w").write("recursive-include " + self.package_name + "/files *\n")
-
         if not os.path.exists(module_folder):
             os.mkdir(module_folder)
 
-        if self.additional_files:
-            additional_files_folder = module_folder + "/files"
-            if not os.path.exists(additional_files_folder):
-                os.mkdir(additional_files_folder)
-            for f in self.additional_files:
-                copy(self.root_folder + "/../files/" + f, additional_files_folder)
+        open(destination + "/MANIFEST.in", "w").write("recursive-include " + self.package_name + " *\n")
 
         if self.readme_file:
             copy(self.root_folder + "/" + self.readme_file, module_folder)
