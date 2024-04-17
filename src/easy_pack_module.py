@@ -25,8 +25,6 @@ class EasyPackModule:
                  url="",
                  license_file="",
                  readme_file="",
-                 setup_py="",
-                 setup_cfg="",
                  folder=""):
         self.major = 0
         self.minor = 0
@@ -44,8 +42,6 @@ class EasyPackModule:
         self.url = url
         self.license_file = license_file
         self.readme_file = readme_file
-        self.setup_py = setup_py
-        self.setup_cfg = setup_cfg
         self.root_folder = folder
 
     def version_string(self):
@@ -78,10 +74,6 @@ class EasyPackModule:
         module_info_script += "\treturn '" + self.readme_file + "' \n\n\n"
         module_info_script += "def __package_name__():\n"
         module_info_script += "\treturn '" + self.package_name + "' \n\n\n"
-        module_info_script += "def __setup_py__():\n"
-        module_info_script += "\treturn '" + self.setup_py + "' \n\n\n"
-        module_info_script += "def __setup_cfg__():\n"
-        module_info_script += "\treturn '" + self.setup_cfg + "' \n\n\n"
         module_info_script += "def __root_folder__():\n"
         module_info_script += "\treturn '" + self.root_folder + "' \n\n\n"
         module_info_script += "def __description__():\n"
@@ -159,10 +151,6 @@ class EasyPackModule:
                 module_info.license_file = info.__license_file__()
             if "__readme_file__" in content:
                 module_info.readme_file = info.__readme_file__()
-            if "__setup_py__" in content:
-                module_info.setup_py = info.__setup_py__()
-            if "__setup_cfg__" in content:
-                module_info.setup_cfg = info.__setup_cfg__()
             if "__root_folder__" in content:
                 module_info.root_folder = info.__root_folder__()
             if "__url__" in content:
@@ -221,15 +209,8 @@ class EasyPackModule:
         if not os.path.exists(self.root_folder + "/__init__.py"):
             return False
 
-        if not self.setup_py:
-            return False
-
-        if not self.setup_cfg:
-            return False
-
         if not os.path.exists(dst):
             os.mkdir(dst)
-
 
         destination = dst + "/" + self.package_file()
 
