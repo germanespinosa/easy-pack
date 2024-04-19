@@ -1,0 +1,18 @@
+{
+    "major": 1,
+    "minor": 0,
+    "build": 127,
+    "source_folder": "easy_pack",
+    "module_name": "easy_pack",
+    "package_name": "easy-pack",
+    "author": "german espinosa",
+    "author_email": "germanespinosa@gmail.com",
+    "description": "easy packing!",
+    "install_requires": [
+        "twine"
+    ],
+    "license_type": "MIT",
+    "url": "https://github.com/germanespinosa/easy-pack",
+    "license_file": "../resources/license.txt",
+    "readme_file": "../resources/README.md"
+}

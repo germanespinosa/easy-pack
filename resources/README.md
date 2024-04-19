@@ -1,21 +1,21 @@
-#Easy module_setup
-A very opinionated single module packaging tool.
+## EasyPack: Build, distribute and deploy modules easily.
+A very simple and powerful single module packaging tool.
 
-## Build, distribute and deploy modules easily.
 
 ###Create a new easy pack project
+#### On the project folder run:
+```shell
+python -m easy_pack.scaffold my_package -module_name my_module -resources_file -mit_license
 ```
-from easy_pack import EasyPackModule
-EasyPackModule.scaffold(project_folder)
-```
-#### Produces the following output:
+#### This will generate the following tree:
 ```
 project_folder 
-│   __info__.py        # module info file
-│   build.py           # build script
+│   module_info.txt    # module info file
 │   
-└───src                # module folder
-│   │   __init__.py    # module 
+└───my_module          # module folder
+│   └─── files         # additional files folder, they will be packed with the module
+│   │   __init__.py    # module file 
+│   │   resources.py   # helper class to access the additional files once the moude is installed 
 │
 └───resources
     │   license.txt    # license file (txt format)
@@ -23,134 +23,102 @@ project_folder
    
 ```
 
-##The __info__.py file
-All module properties are stored in the __info__.py file.
+##The module_info.txt file
 To customize your module, edit this file to match your code.
 
-####Module version:
-Returns a triplet with major, minor and build number
-```
-def __module_version__():
-	return 0, 0, 1 
-```
+####Module versioning:
+Three integers (major, minor, build) uniquely identifying a specific build. 
+The system will automatically increment the build number in each build. 
+Minor and major values should be adjusted manually.
 
 ####Module name:
-Returns a string with the name of the module 
-```
-def __module_name__():
-	return 'module_name' 
-```
+String containing the name of the module 
 
 ####Author:
-Returns a string with the name of the author (your name)
-```
-def __author__():
-	return 'author' 
-```
+String containing the name of the author (your name)
 
 ####Author email:
-Returns a string with the email of the author (your email)
-```
-def __author_email__():
-	return 'author@email'  
-```
+String containing the email of the author (your email)
 
 ####Package description:
-Returns a string with a brief description of your package
-```
-def __package_description__():
-	return 'a brief description of your package'  
-```
-
+String containing a brief description of your package
 
 ####Required packages:
-Returns a list of strings with the packages your package is dependent on: 
-```
-def __install_requires__():
-    return ['matplotlib', 'numpy']  
-```
+List of strings with the packages your package is dependent on.
+Example: ['easy-pack', 'matplotlib', 'numpy']  
 
 ####Package url:
-Returns a string with the url of your project (usually a github repository):
-```
-def __url__():
-	return 'https://github.com/germanespinosa/easy-pack' 
-```
+String containing the url of your project (usually a github repository).
+Example: 'https://github.com/germanespinosa/easy-pack'
 
 ####License type:
-Returns a string with the license type (ie "MIT"):
-```
-def __license__():
-	return 'MIT' 
-```
+String containing a string with the license type (ie "MIT").
 
 ####License file:
-Returns a string with the relative path (from the module folder) to the license file: 
-```
-def __license_file__():
-    return '../resources/license.txt' 
-```
-
+String containing the relative path (from the module folder) to the license file.
 
 ####Readme file:
-Returns a string with the relative path (from the module folder) to the readme file:
-```
-def __readme_file__():
-	return '../resources/README.md' 
-```
+String containing the relative path (from the module folder) to the readme file.
 
 ####Package name:
-Returns a string with the name of your package:
-```
-def __package_name__():
-	return 'package_name' 
-```
+String containing the name of your package
 
 ####Module description:
-Returns a string with a brief description of your module:
-```
-def __description__():
-    return 'a brief description of your module' 
-```
+String containing a brief description of your module
 
 ###Building the package:
-After modifying the __info__.py file to mach your module run:
-```
-python build.py 
+On the project folder run:
+``` shell
+python -m easy_pack.build 
 ```
 
-#### Produces the following output:
+#### This will generate a folder python-build with the following tree:
 ```
-project_folder 
-│   
-└───python-build                              
-    └───package_name-version                  # build folder
-        └───dist
-        │   │   package_name-version.tar.gz   # package
-        └───package_name                      # unpacked files
-        │   │   package_file_01               
-        │   │   package_file_02  
-        │   │   package_file_03  
-        │   │   package_file_04  
-        └───package_name.egg-info             # supporting files
-        │   │   dependency_links.txt  
-        │   │   not-zip-safe
-        │   │   PKG-INFO  
-        │   │   requires.txt  
-        │   │   SOURCES.txt  
-        │   │   top_level.txt  
-        │   README.md                         # readme file
-        │   setup.py                          # setup
+python-build                              
+└───my_module-version                     # build folder
+    └───dist
+    │   │   my_package-version.tar.gz     # package
+    └───my_module                         # unpacked files
+    │   └───files                         # additional files folder 
+    │   │   __init__.py               
+    │   │   resources.py  
+    └───my_module.egg-info                # supporting files
+    │   │   dependency_links.txt  
+    │   │   not-zip-safe
+    │   │   PKG-INFO  
+    │   │   requires.txt  
+    │   │   SOURCES.txt  
+    │   │   top_level.txt  
+    │   MANIFEST.in                       # manifest file
+    │   README.md                         # readme file
+    │   setup.py                          # setup
         
 ```
+### Installing your package locally using pip
+From the build folder run:
+```
+pip install .
+```
 
-### Uploading your package to pypi
+### Installing your package locally using Easy-Pack build tool
+You can install a package after build using the install parameter:
+``` shell
+python -m easy_pack.build -install 
+```
+
+### Uploading your package to pypi using Twine
 To upload your package to pypi you will need a (https://pypi.org/) account.
 from the build folder run:
 ```
- twine upload dist/*
+python -m twine upload dist/*
 ```
-you will be asked username and password.
+you will be asked username and password, the password value is a token generated on the pypi website.
+
+### Uploading your package to pypi using Easy-Pack build tool
+You can upload a package after build using the upload parameter:
+``` shell
+python -m easy_pack.build -upload -user [USERNAME] -password [TOKEN] 
+```
 
 
 ### Testing your package
@@ -163,4 +131,8 @@ Once the installation is finished, open python and try importing your module:
 import [module_name] 
 ```
 
-# You are all done
+## You are all done
+
+---
+
+<small>Package created with Easy-pack</small>
