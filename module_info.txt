@@ -1,7 +1,7 @@
 {
     "major": 1,
     "minor": 0,
-    "build": 127,
+    "build": 136,
     "source_folder": "easy_pack",
     "module_name": "easy_pack",
     "package_name": "easy-pack",

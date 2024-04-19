@@ -2,7 +2,7 @@
 A very simple and powerful single module packaging tool.
 
 
-###Create a new easy pack project
+### Create a new easy pack project
 #### On the project folder run:
 ```shell
 python -m easy_pack.scaffold my_package -module_name my_module -resources_file -mit_license
@@ -10,63 +10,63 @@ python -m easy_pack.scaffold my_package -module_name my_module -resources_file -
 #### This will generate the following tree:
 ```
 project_folder 
-│   module_info.txt    # module info file
-│   
-└───my_module          # module folder
-│   └─── files         # additional files folder, they will be packed with the module
-│   │   __init__.py    # module file 
-│   │   resources.py   # helper class to access the additional files once the moude is installed 
-│
-└───resources
-    │   license.txt    # license file (txt format)
-    │   readme.md      # readme (mark-down format)
+|-- module_info.txt    # module info file
+|-- my_module          # module folder
+|   |-- files          # additional files folder
+|   |   |-- ..         # place any file here and it will be packed with the module
+|   |-- __init__.py    # module file 
+|   |-- resources.py   # helper class to access the additional files once the moude is installed 
+|
+|-- resources
+    |-- license.txt    # license file (txt format)
+    |-- readme.md      # readme (mark-down format)
    
 ```
 
-##The module_info.txt file
+## The module_info.txt file
 To customize your module, edit this file to match your code.
 
-####Module versioning:
+#### Module versioning:
 Three integers (major, minor, build) uniquely identifying a specific build. 
 The system will automatically increment the build number in each build. 
 Minor and major values should be adjusted manually.
 
-####Module name:
+#### Module name:
 String containing the name of the module 
 
-####Author:
+#### Author:
 String containing the name of the author (your name)
 
-####Author email:
+#### Author email:
 String containing the email of the author (your email)
 
-####Package description:
+#### Package description:
 String containing a brief description of your package
 
-####Required packages:
-List of strings with the packages your package is dependent on.
-Example: ['easy-pack', 'matplotlib', 'numpy']  
+#### Required packages:
+List of strings with the packages your package is dependent on
+(ie. ['easy-pack', 'matplotlib', 'numpy']).
 
-####Package url:
-String containing the url of your project (usually a github repository).
-Example: 'https://github.com/germanespinosa/easy-pack'
+#### Package url:
+String containing the url of your project, usually a github repository
+(ie. 'https://github.com/germanespinosa/easy-pack').
 
-####License type:
-String containing a string with the license type (ie "MIT").
+#### License type:
+String containing a string with the license type (ie. "MIT").
 
-####License file:
+#### License file:
 String containing the relative path (from the module folder) to the license file.
 
-####Readme file:
+#### Readme file:
 String containing the relative path (from the module folder) to the readme file.
 
-####Package name:
+#### Package name:
 String containing the name of your package
 
-####Module description:
+#### Module description:
 String containing a brief description of your module
 
-###Building the package:
+### Building the package:
 On the project folder run:
 ``` shell
 python -m easy_pack.build 
@@ -74,25 +74,24 @@ python -m easy_pack.build
 
 #### This will generate a folder python-build with the following tree:
 ```
-python-build                              
-└───my_module-version                     # build folder
-    └───dist
-    │   │   my_package-version.tar.gz     # package
-    └───my_module                         # unpacked files
-    │   └───files                         # additional files folder 
-    │   │   __init__.py               
-    │   │   resources.py  
-    └───my_module.egg-info                # supporting files
-    │   │   dependency_links.txt  
-    │   │   not-zip-safe
-    │   │   PKG-INFO  
-    │   │   requires.txt  
-    │   │   SOURCES.txt  
-    │   │   top_level.txt  
-    │   MANIFEST.in                       # manifest file
-    │   README.md                         # readme file
-    │   setup.py                          # setup
-        
+python-build
+|-- my_module-version                    # build folder
+|   |-- dist
+|   |   |-- my_package-version.tar.gz    # package
+|   |-- my_module                        # unpacked files
+|   |   |-- files                        # additional files folder 
+|   |   |   |-- __init__.py              
+|   |   |   |-- resources.py  
+|   |-- my_module.egg-info               # supporting files
+|   |   |-- dependency_links.txt  
+|   |   |-- not-zip-safe
+|   |   |-- PKG-INFO  
+|   |   |-- requires.txt  
+|   |   |-- SOURCES.txt  
+|   |   |-- top_level.txt  
+|-- MANIFEST.in                          # manifest file
+|-- README.md                            # readme file
+|-- setup.py                             # setup
 ```
 ### Installing your package locally using pip
 From the build folder run:
@@ -133,6 +132,3 @@ import [module_name]
 
 ## You are all done
 
----
-
-<small>Package created with Easy-pack</small>

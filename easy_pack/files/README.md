@@ -34,8 +34,5 @@ This project is licensed under the [License Name] - see the [LICENSE](LICENSE) f
 
 For any questions or suggestions, feel free to contact us at [contact email].
 
----
-
-<small>Package created with Easy-pack</small>
 
 

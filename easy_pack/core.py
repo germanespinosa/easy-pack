@@ -78,7 +78,7 @@ class EasyPackModule:
         if self.module_info["author_email"]:
             setup_py += "      author_email='" + self.module_info["author_email"] + "',\n"
         if self.module_info["readme_file"]:
-            setup_py += "      long_description=open('./" + self.module_info["module_name"] + "/" + self.module_info["readme_file"].split("/")[-1] + "').read(),\n"
+            setup_py += "      long_description=open('./" + self.module_info["module_name"] + "/" + self.module_info["readme_file"].split("/")[-1] + "').read() + '\\n---\\n<small>Package created with Easy-pack</small>\\n',\n"
             setup_py += "      long_description_content_type='text/markdown',\n"
         if self.module_info["package_name"]:
             setup_py += "      packages=['" + self.module_info["module_name"] + "'],\n"
