@@ -151,6 +151,7 @@ class EasyPackModule:
 
 
 def convert_old_module_file(old_module_file, new_module_file):
+    print(f"A module file created by a previous version of easy pack was found '{old_module_file}'.")
     folder = os.path.dirname(old_module_file)
     must_remove = False
     if folder not in sys.path:
@@ -229,4 +230,6 @@ def convert_old_module_file(old_module_file, new_module_file):
     with open(new_module_file, 'w') as f:
         json.dump(module_info, f, indent=4)
 
+    print(f"This file has been converted to the new format at '{new_module_file}' and renamed '__info__.back'.")
+    print("Consider the steps of adding the new module file to your code project.")
     os.rename(old_module_file, os.path.join(folder, "__info__.back"))
