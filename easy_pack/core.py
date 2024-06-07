@@ -15,7 +15,7 @@ class EasyPackModule:
                  author="author",
                  author_email="author@email",
                  description="",
-                 install_requires="",
+                 install_requires=[],
                  license_type="",
                  url="",
                  license_file="",
